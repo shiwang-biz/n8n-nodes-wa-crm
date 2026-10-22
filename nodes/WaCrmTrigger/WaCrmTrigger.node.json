@@ -1,0 +1,10 @@
+{
+	"node": "n8n-nodes-wa-crm.waCrmTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "Sales"],
+	"resources": {
+		"credentialDocumentation": [{ "url": "https://github.com/shiwang-biz/n8n-nodes-wa-crm#credentials" }],
+		"primaryDocumentation": [{ "url": "https://github.com/shiwang-biz/n8n-nodes-wa-crm#readme" }]
+	}
+}
