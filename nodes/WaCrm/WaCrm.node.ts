@@ -16,6 +16,8 @@ import {
 	accountOperations,
 	campaignFields,
 	campaignOperations,
+	chatbotFields,
+	chatbotOperations,
 	templateFields,
 	templateOperations,
 } from './descriptions/OtherDescriptions';
@@ -43,6 +45,7 @@ export class WaCrm implements INodeType {
 				options: [
 					{ name: 'Account', value: 'account' },
 					{ name: 'Campaign', value: 'campaign' },
+					{ name: 'Chatbot', value: 'chatbot' },
 					{ name: 'Contact', value: 'contact' },
 					{ name: 'Conversation', value: 'conversation' },
 					{ name: 'Message', value: 'message' },
@@ -60,6 +63,8 @@ export class WaCrm implements INodeType {
 			...templateFields,
 			...campaignOperations,
 			...campaignFields,
+			...chatbotOperations,
+			...chatbotFields,
 			...accountOperations,
 		],
 	};
@@ -86,6 +91,10 @@ export class WaCrm implements INodeType {
 						description: `${t.category.toLowerCase()} · ${t.variables?.body ?? 0} variable${t.variables?.body === 1 ? '' : 's'}`,
 					}))
 					.sort((a, b) => a.name.localeCompare(b.name));
+			},
+			async getBots(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const r = (await apiRequest.call(this, 'GET', '/bots')) as { data: Array<{ id: string; name: string; enabled: boolean }> };
+				return r.data.map((b) => ({ name: b.name, value: b.id, description: b.enabled ? 'On' : 'Switched off' }));
 			},
 			async getTeam(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const r = (await apiRequest.call(this, 'GET', '/team')) as { data: Array<{ name: string; email: string; role: string; openConversations: number }> };
@@ -275,6 +284,22 @@ export class WaCrm implements INodeType {
 				if (resource === 'campaign') {
 					if (operation === 'get') push(await apiRequest.call(this, 'GET', `/campaigns/${encodeURIComponent(this.getNodeParameter('campaignId', i) as string)}`));
 					else push(((await apiRequest.call(this, 'GET', '/campaigns', undefined, { limit: this.getNodeParameter('limit', i) })) as { data: IDataObject[] }).data);
+					continue;
+				}
+
+				if (resource === 'chatbot') {
+					if (operation === 'getAll') {
+						push(((await apiRequest.call(this, 'GET', '/bots')) as { data: IDataObject[] }).data);
+						continue;
+					}
+					const botId = this.getNodeParameter('botId', i) as string;
+					const target = this.getNodeParameter('target', i) as string;
+					const rows = ((this.getNodeParameter('values', i, {}) as IDataObject).value as Array<{ name: string; value: string }> | undefined) ?? [];
+					const values: IDataObject = {};
+					for (const r of rows) if (r.name) values[r.name.trim().toLowerCase()] = String(r.value ?? '');
+					const o = this.getNodeParameter('options', i, {}) as IDataObject;
+					const body: IDataObject = target === 'phone' ? { phone: this.getNodeParameter('phone', i) } : { conversationId: this.getNodeParameter('conversationId', i) };
+					push(await apiRequest.call(this, 'POST', `/bots/${encodeURIComponent(botId)}/start`, clean({ ...body, values, accountId: o.accountId })));
 					continue;
 				}
 

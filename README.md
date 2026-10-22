@@ -33,6 +33,7 @@ n8n checks the connection when you save.
 | Contact | Create or Update · Get · Get Many · Add Tags · Remove Tags · Opt Out · Opt In |
 | Template | Get Many · Sync |
 | Campaign | Get Many · Get |
+| Chatbot | Get Many · Start (in a chat, by phone number or conversation ID, with values the bot can use) |
 | Account | Get · Get Team Members |
 
 WhatsApp's rule applies to free-form messages (text, media, buttons, lists): you can only send them within **24 hours of the customer's last message**. Outside that window, send an approved **template**. Every message costs the same as it does from the panel.
@@ -49,6 +50,7 @@ Set an **Idempotency Key** on a send (for example, your order ID). If n8n retrie
 | Conversation Status Changed | A chat was opened, set to pending or resolved, including when a customer reopens it by writing. |
 | Contact Opted Out / Opted In | The customer replied STOP / START, or was opted out or in by your team or the API. |
 | Campaign Finished | A campaign finished sending, with its final counts. |
+| Chatbot Started / Ended | A chatbot started talking with a customer, or the conversation with it ended. `outcome` says how: `COMPLETED`, `HANDED_OVER`, `TIMED_OUT`, `TAKEN_OVER` (a person replied), `STOPPED` or `FAILED`. `values` holds the answers the bot saved. |
 
 The trigger has three options:
 
@@ -67,6 +69,8 @@ The panel must be able to reach n8n over the internet. n8n Cloud works. A self-h
 - **Auto-reply with a menu**: Trigger (Message Received, only first message) → WhatsApp CRM *Send Buttons* ("Order", "Track", "Talk to us").
 - **Leads into your CRM**: Trigger (Message Received, only first message) → your CRM node → WhatsApp CRM *Add Note* ("Lead created").
 - **Order updates**: Shopify / WooCommerce trigger → WhatsApp CRM *Send Template* with an Idempotency Key set to the order ID.
+- **Order status inside a chatbot**: in the panel's chatbot builder, add a *Webhook* step that calls an n8n Webhook node. Look up the order, then answer with *Respond to Webhook* and JSON such as `{"reply": "Your order ships today", "status": "shipped"}`. The bot sends `reply` and can use `{{status}}` in later steps.
+- **Follow up after a purchase**: Shopify trigger → WhatsApp CRM *Start* chatbot (a bot that begins with a template), with `order_no` as a value.
 - **Hand-off**: Trigger (Message Received) → IF text contains "agent" → WhatsApp CRM *Assign* to a team member.
 
 ## Compatibility

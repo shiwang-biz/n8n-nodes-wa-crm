@@ -12,6 +12,8 @@ import { apiRequest } from '../WaCrm/GenericFunctions';
 
 const EVENTS = [
 	{ name: 'Campaign Finished', value: 'campaign.completed', description: 'A campaign finished sending, with its final counts' },
+	{ name: 'Chatbot Ended', value: 'bot.ended', description: 'A chatbot conversation ended: finished, handed to a person, timed out, taken over…' },
+	{ name: 'Chatbot Started', value: 'bot.started', description: 'A chatbot started talking with a customer' },
 	{ name: 'Contact Opted In', value: 'contact.opted_in', description: 'A contact replied START or was opted back in' },
 	{ name: 'Contact Opted Out', value: 'contact.opted_out', description: 'A contact replied STOP or was opted out' },
 	{ name: 'Conversation Assigned', value: 'conversation.assigned', description: 'A chat was given to someone, or unassigned' },
@@ -31,7 +33,7 @@ export class WaCrmTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["events"].join(", ")}}',
-		description: 'Starts the workflow when customers message you, chats change or contacts opt out',
+		description: 'Starts the workflow when customers message you, chats change, chatbots start or end, or contacts opt out',
 		defaults: { name: 'WhatsApp CRM Trigger' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],

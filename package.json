@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-wa-crm",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "n8n nodes for WhatsApp CRM panels: send templates, text, media, buttons and lists; work the shared inbox; manage contacts; start workflows on customer messages and other events.",
 	"license": "MIT",
 	"homepage": "https://github.com/shiwang-biz/n8n-nodes-wa-crm#readme",
