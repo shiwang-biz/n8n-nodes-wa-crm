@@ -104,6 +104,6 @@ jobs:
           fi
           set -o pipefail
           # On failure, the last lines become error notes on the run, readable without the full log.
-          npm run release 2>&1 | tee release.log || { tail -n 25 release.log | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^/::error::/'; exit 1; }
+          npm run release 2>&1 | tee release.log || { sed -e 's/\x1b\[[0-9;]*m//g' release.log | grep -iE 'npm error|error|E4[0-9]{2}|forbidden|provenance|otp' | grep -v 'A complete log' | tail -n 9 | sed -e 's/^/::error::/'; exit 1; }
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NPMJS }}
